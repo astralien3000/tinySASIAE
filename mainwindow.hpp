@@ -21,7 +21,7 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
-    Robot _robot;
+    Robot& _robot;
 };
 
 #endif // MAINWINDOW_H
