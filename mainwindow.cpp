@@ -16,6 +16,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::update()
 {
+    QMainWindow::update();
     ui->widthLabel->setText(QString("Width: %1").arg(_robot.width));
     ui->xLabel->setText(QString("X: %1").arg(_robot.x));
     ui->yLabel->setText(QString("Y: %1").arg(_robot.y));
