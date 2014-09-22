@@ -18,6 +18,7 @@ public:
     ~MainWindow();
 
   void renderRobot(void);
+  void renderWorld(void);
 
 public slots:
     void update();
