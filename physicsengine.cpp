@@ -2,10 +2,10 @@
 #include <cmath>
 
 PhysicsEngine::PhysicsEngine(Robot& robot)
-  : _robot(robot), _time(0) {
+  : _robot(robot), _time(0.) {
 }
 
-double PhysicsEngine::getTime()
+double PhysicsEngine::getTime() const
 {
   return _time;
 }

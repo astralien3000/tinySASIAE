@@ -15,7 +15,7 @@ private:
 public:
   PhysicsEngine(Robot& robot);
 
-  double getTime(void);
+  double getTime(void) const;
 
 public slots:
   void update(void);
