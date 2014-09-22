@@ -10,9 +10,12 @@ class PhysicsEngine : public QObject
 
 private:
   Robot& _robot;
+  double _time;
 
 public:
   PhysicsEngine(Robot& robot);
+
+  double getTime(void);
 
 public slots:
   void update(void);
