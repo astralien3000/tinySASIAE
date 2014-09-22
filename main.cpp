@@ -4,8 +4,10 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
 
+    Robot r;
+    MainWindow w(r);
+    w.show();
+    w.update();
     return a.exec();
 }
