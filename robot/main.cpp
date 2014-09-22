@@ -20,8 +20,15 @@ int main(int argc, char** argv) {
   Motor<s32> rightMotor("rightMot", &rm);
 
   leftMotor.setValue(128);
+  rightMotor.setValue(128);
   
   while(Aversive::sync()) {
+    if(leftEnc.getValue() >= 15) {
+      leftMotor.setValue(0);
+    }
+    if(rightEnc.getValue() >= 15) {
+      rightMotor.setValue(0);
+    }
   }
   
   return Aversive::exit();
