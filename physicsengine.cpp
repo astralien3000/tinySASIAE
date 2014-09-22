@@ -16,7 +16,7 @@ void PhysicsEngine::update() {
   double right_move = _robot.right_speed * delta_t;
 
   double dist_move = left_move + right_move;
-  double angle_move = (left_move - right_move) / _robot.width;
+  double angle_move = (right_move - left_move) * 2.0 / (_robot.width);
 
   _time += delta_t;
 

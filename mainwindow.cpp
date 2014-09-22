@@ -77,13 +77,17 @@ void MainWindow::renderWorld() {
 void MainWindow::update()
 {
     QMainWindow::update();
+    _scene.clear();
     renderWorld();
     renderRobot();
+
+    double display_angle = fmod(_robot.angle * 180.0 / M_PI, 360);
+    if(display_angle < 0.0) display_angle += 360.0;
 
     ui->widthLabel->setText(QString("Width: %1").arg(_robot.width));
     ui->xLabel->setText(QString("X: %1").arg(_robot.x));
     ui->yLabel->setText(QString("Y: %1").arg(_robot.y));
-    ui->angleLabel->setText(QString("Angle: %1").arg(_robot.angle));
+    ui->angleLabel->setText(QString("Angle: %1").arg(display_angle));
     ui->leftSpeedLabel->setText(QString("Left speed: %1").arg(_robot.left_speed));
     ui->rightSpeedLabel->setText(QString("Right speed: %1").arg(_robot.right_speed));
     ui->leftEncLabel->setText(QString("Left enc: %1").arg(_robot.left_encoder));
