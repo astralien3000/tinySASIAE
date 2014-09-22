@@ -12,13 +12,16 @@ TARGET = tinySASIAE
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    physicsengine.cpp
+SOURCES += \
+    main.cpp\
+    mainwindow.cpp \
+    physicsengine.cpp \
+    robotbin.cpp
 
 HEADERS  += \
     mainwindow.hpp\
     robot.hpp \
-    physicsengine.hpp
+    physicsengine.hpp \
+    robotbin.hpp
 
 FORMS    += mainwindow.ui
