@@ -2,14 +2,21 @@
 
 #include <QException>
 #include <QStringList>
+#include <QDebug>
 #include <stdint.h>
 
-static const char *const binPath = "./robot_sasiae.elf";
+#include <QCoreApplication>
+
+static const char *const binPath = "robot/robot_sasiae.elf";
 static const double encCoef = 1.;
 static const double timeCoef = 1.;
 static const int mainLoopIteration = 10;
 static const double leftMotCoef = 1.;
 static const double rightMotCoef = 1.;
+
+// Device initialisation messages
+static const char *const leftEncInit = "D leftEnc init";
+static const char *const rightEncInit = "D rightEnc init";
 
 // From SASIAE to robot code messages
 static const char *const leftEncMsg = "D leftEnc value %1";
@@ -29,8 +36,37 @@ static const char *const stopMsg = "S";
 RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
     QObject(parent), _robot(robot), _engine(engine)
 {
-    _proc.start(binPath, QStringList());
+    QString path = QCoreApplication::applicationDirPath().append("/../tinySASIAE/").append(binPath);
+    _proc.start(path, QStringList());
     if(!_proc.waitForStarted()) {
+        qDebug() << "Could not start robot's code with path: " << path << "\n";
+        throw QException();
+    }
+
+    bool le = false, re = false;
+    for(int i = 0; i < 2; i++)
+    {
+        QString line = readLineFromProc();
+        if(line == leftEncInit)
+        {
+            le = true;
+        }
+        else if(line == rightEncInit)
+        {
+            re = true;
+        }
+        else
+        {
+            qDebug() << line << "\n";
+            killProc();
+            throw QException();
+        }
+    }
+
+    if(!(le && re))
+    {
+        qDebug() << "All the devices were not initialised\n";
+        killProc();
         throw QException();
     }
 }
@@ -55,6 +91,7 @@ void RobotBin::update()
         QStringList words = line.split(" ");
         if(words.length() != 4)
         {
+            qDebug() << line << "\n";
             killProc();
             throw QException();
         }

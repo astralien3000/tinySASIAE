@@ -1,22 +1,28 @@
-// Minimal main code
-
 #include <aversive.hpp>
+
+#include <device/eirbot2014/motor.hpp>
+#include <device/eirbot2014/encoder.hpp>
+
+s32 le;
+s32 re;
+s32 lm;
+s32 rm;
 
 int main(int argc, char** argv) {
   (void) argc;
   (void) argv;
   
   Aversive::init();
-  // Declare your devices here
-  // Initialize your stuff here
+  
+  Encoder<s32> leftEnc("leftEnc", &le);
+  Encoder<s32> rightEnc("rightEnc", &re);
+  Motor<s32> leftMotor("leftMot", &lm);
+  Motor<s32> rightMotor("rightMot", &rm);
+
+  leftMotor.setValue(128);
   
   while(Aversive::sync()) {
-    // Your while(1) code
   }
   
-  // You can have several "while(Aversive::sync())" loops if needed
-  
-  // Unintialize your stuff here
-  Aversive::setReturnCode(0); // Optional; default value is already 0
   return Aversive::exit();
 }

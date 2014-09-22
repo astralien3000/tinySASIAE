@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include "physicsengine.hpp"
+#include "robotbin.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -21,7 +22,9 @@ int main(int argc, char *argv[])
     w.show();
     w.update();
 
+    RobotBin bin(r, engine);
 
+    timer.connect(&timer, SIGNAL(timeout()), &bin, SLOT(update()));
     timer.connect(&timer, SIGNAL(timeout()), &engine, SLOT(update()));
     timer.connect(&timer, SIGNAL(timeout()), &w, SLOT(update()));
 
