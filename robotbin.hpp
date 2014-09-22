@@ -13,6 +13,7 @@ class RobotBin : public QObject
     Q_OBJECT
 public:
     explicit RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent = 0);
+    virtual ~RobotBin();
 
 signals:
 
