@@ -24,7 +24,7 @@ PidFilter left_pid;
 PidFilter right_pid;
 
 DiffFilter left_diff;
-DiffFilter left_diff;
+DiffFilter right_diff;
 
 Encoder<s32> left_enc("leftEnc", &le);
 Encoder<s32> right_enc("rightEnc", &re);
@@ -32,7 +32,7 @@ Motor<s32> left_motor("leftMot", &lm);
 Motor<s32> right_motor("rightMot", &rm);
 
 MotorController left_cmot(left_motor, left_enc, id, left_diff, left_pid);
-MotorController right_cmot(right_motor, right_enc, id, left_diff, right_pid);
+MotorController right_cmot(right_motor, right_enc, id, right_diff, right_pid);
 
 Odometer odo(right_enc, left_enc);
 
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
   right_pid.setOutShift(6);
 
   left_diff.setDelta(1);
-  left_diff.setDelta(1);
+  right_diff.setDelta(1);
 
   dist_pid.setGains(10,0,0);
   dist_pid.setOutShift(0);
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
   odo.setImpPerDeg(100000);
 
   Task t([]{
-      robot.setValue(Vect<2, s32>(2000,90));
+      robot.setValue(Vect<2, s32>(1000,0));
     });
   t.setRepeat();
   t.setPeriod(100000);
