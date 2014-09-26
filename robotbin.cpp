@@ -8,11 +8,11 @@
 #include <QCoreApplication>
 
 static const char *const binPath = "robot/robot_sasiae.elf";
-static const double encCoef = 1.;
-static const double timeCoef = 1.;
+static const double encCoef = 100.;
+static const double timeCoef = 1000000.;
 static const int mainLoopIteration = 10;
 static const double leftMotCoef = 1.;
-static const double rightMotCoef = 1.;
+static const double rightMotCoef = 1.2;
 
 // Device initialisation messages
 static const char *const leftEncInit = "D leftEnc init";
