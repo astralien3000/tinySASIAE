@@ -1,6 +1,8 @@
 #include "robotbin.hpp"
 
-#include <QException>
+//#include <QException>
+#include <stdexcept>
+
 #include <QStringList>
 #include <QDebug>
 #include <stdint.h>
@@ -40,7 +42,7 @@ RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
     _proc.start(path, QStringList());
     if(!_proc.waitForStarted()) {
         qDebug() << "Could not start robot's code with path: " << path << "\n";
-        throw QException();
+        throw std::runtime_error("");
     }
 
     bool le = false, re = false;
@@ -59,7 +61,7 @@ RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
         {
             qDebug() << line << "\n";
             killProc();
-            throw QException();
+            throw std::runtime_error("");
         }
     }
 
@@ -67,7 +69,7 @@ RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
     {
         qDebug() << "All the devices were not initialised\n";
         killProc();
-        throw QException();
+        throw std::runtime_error("");
     }
 }
 
@@ -93,7 +95,7 @@ void RobotBin::update()
         {
             qDebug() << line << "\n";
             killProc();
-            throw QException();
+            throw std::runtime_error("");
         }
 
         if(words[0] == QString(deviceMsg) && words[2] == QString(valueMsg))
@@ -110,13 +112,13 @@ void RobotBin::update()
             else
             {
                 killProc();
-                throw QException();
+                throw std::runtime_error("");
             }
         }
         else
         {
             killProc();
-            throw QException();
+            throw std::runtime_error("");
         }
     }
 }
