@@ -7,6 +7,8 @@
 #include <QDebug>
 #include <stdint.h>
 
+#include <iostream>
+
 #include <QCoreApplication>
 
 static const char *const binPath = "robot/robot_sasiae.elf";
@@ -19,6 +21,7 @@ static const double rightMotCoef = 1.2;
 // Device initialisation messages
 static const char *const leftEncInit = "D leftEnc init";
 static const char *const rightEncInit = "D rightEnc init";
+static const char *const ioInit = "D io init";
 
 // From SASIAE to robot code messages
 static const char *const leftEncMsg = "D leftEnc value %1";
@@ -30,6 +33,7 @@ static const char *const syncMsg2 = "T";
 static const char *const deviceMsg = "D";
 static const char *const leftMotName = "leftMot";
 static const char *const rightMotName = "rightMot";
+static const char *const ioName = "io";
 static const char *const valueMsg = "value";
 
 // Generic messages
@@ -46,7 +50,7 @@ RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
     }
 
     bool le = false, re = false;
-    for(int i = 0; i < 2; i++)
+    for(int i = 0; i < 3; i++)
     {
         QString line = readLineFromProc();
         if(line == leftEncInit)
@@ -56,6 +60,10 @@ RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
         else if(line == rightEncInit)
         {
             re = true;
+        }
+        else if(line == ioInit)
+        {
+            // NOTHING TO DO
         }
         else
         {
@@ -108,6 +116,9 @@ void RobotBin::update()
             else if(words[1] == QString(rightMotName))
             {
                 _robot.right_speed = rightMotCoef * speed;
+            }
+            else if(words[1] == QString(ioName)) {
+                std::cout << (char)words[3].toInt();
             }
             else
             {
