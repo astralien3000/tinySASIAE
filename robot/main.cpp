@@ -22,9 +22,16 @@ int main(int argc, char** argv) {
     if(example::asserv_get_angle() == 45) {
       example::asserv_goto(1000, 45);
     }
-    else if(abs(example::asserv_get_dist() - 1000) < 30) {
+
+    if(abs(example::asserv_get_dist() - 1000) < 2) {
       example::asserv_goto(1000, 180);
     }
+
+    if(example::asserv_get_angle() == 180) {
+      example::asserv_goto(3000, 180);
+    }
+
+    io << "test " << example::asserv_get_dist() << "\n";
   }
   
   return Aversive::exit();
