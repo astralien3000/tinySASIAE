@@ -6,22 +6,15 @@
 
 #include <device/stream/uart_stream.hpp>
 
-// Dummy variables
-// used by memory-bound devices
-s32 le;
-s32 re;
-s32 lm;
-s32 rm;
-
 // Encoder devices
-Encoder<s32> left_enc("leftEnc", &le);
-Encoder<s32> right_enc("rightEnc", &re);
+extern Encoder<s32> left_enc;
+extern Encoder<s32> right_enc;
 
 // Motor devices
-Motor<s32> left_motor("leftMot", &lm);
-Motor<s32> right_motor("rightMot", &rm);
+extern Motor<s32> left_motor;
+extern Motor<s32> right_motor;
 
 // COMM
-UartStream<0> io("io");
+extern UartStream<0> io;
 
 #endif//DEVICES_HPP
