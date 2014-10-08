@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 
     MainWindow w(r);
     w.show();
+    w.showMaximized();
     w.update();
 
     RobotBin bin(r, engine);
