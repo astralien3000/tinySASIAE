@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "robot.hpp"
 #include <QGraphicsScene>
+#include <QLinkedList>
 
 namespace Ui {
 class MainWindow;
@@ -28,6 +29,10 @@ private:
     Robot& _robot;
 
     QGraphicsScene _scene;
+    QLinkedList<QPointF> _pointList;
+
+    static const int POINT_LIST_SIZE = 50;
+    static const int ADD_POINT_EVERY = 10;
 };
 
 #endif // MAINWINDOW_H

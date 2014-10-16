@@ -49,6 +49,27 @@ void MainWindow::renderRobot() {
   _scene.addPolygon(bot);
   _scene.addPolygon(right_wheel);
   _scene.addPolygon(left_wheel);
+
+  const QPointF* prev = NULL;
+  int j = 0;
+  for(QLinkedList<QPointF>::Iterator i = _pointList.begin(); i != _pointList.end(); i++, j++) {
+      if(prev) {
+          QLine line((int) prev->x(), (int) prev->y(), (int) (*i).x(), (int) (*i).y());
+          QPen pen(QBrush(QColor(255, 0, 0, 255 - (255. / POINT_LIST_SIZE * j))), 3);
+          _scene.addLine(line, pen);
+      }
+      prev = &(*i);
+  }
+
+  static int cpt = 0;
+  if(++cpt > ADD_POINT_EVERY) {
+      cpt = 0;
+      _pointList.prepend(pos);
+  }
+
+  while(_pointList.size() > POINT_LIST_SIZE) {
+      _pointList.removeLast();
+  }
 }
 
 void MainWindow::renderWorld() {
