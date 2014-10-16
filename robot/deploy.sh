@@ -1,4 +1,3 @@
 #!/bin/bash
 
-make sasiae
-../../build-tinySASIAE-Desktop-Release/tinySASIAE
+make sasiae && ../../build-tinySASIAE-Desktop-Release/tinySASIAE
