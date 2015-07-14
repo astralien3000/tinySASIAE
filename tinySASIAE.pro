@@ -25,3 +25,6 @@ HEADERS  += \
     robotbin.hpp
 
 FORMS    += mainwindow.ui
+
+target.path = /usr/local/bin
+INSTALLS += target
