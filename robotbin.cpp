@@ -42,7 +42,25 @@ static const char *const stopMsg = "S";
 RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
     QObject(parent), _robot(robot), _engine(engine)
 {
-    QString path = QCoreApplication::applicationDirPath().append("/../tinySASIAE/").append(binPath);
+    QStringList args = QCoreApplication::arguments();
+    QString path = "";
+    bool found = false;
+    for(int i = 0 ; i < args.count() ; i++) {
+        if(args[i] == "-r") {
+            if(i+1 < args.count()) {
+                path = args[i+1];
+                found = true;
+            }
+            else {
+                qDebug() << "Error in arguments : nothing after -r";
+            }
+        }
+    }
+    if(!found) {
+        qDebug() << "Robot's binary not found in application's arguments, trying default.";
+        path = binPath;
+    }
+
     _proc.start(path, QStringList());
     if(!_proc.waitForStarted()) {
         qDebug() << "Could not start robot's code with path: " << path << "\n";
