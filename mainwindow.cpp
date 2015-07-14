@@ -9,7 +9,7 @@ MainWindow::MainWindow(Robot& robot, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->graphicsView->setScene(&_scene);
-    ui->graphicsView->scale(1, -1);
+    ui->graphicsView->scale(1, 1);
 }
 
 MainWindow::~MainWindow()
