@@ -69,7 +69,7 @@ namespace Example {
     t.setRepeat();
     t.setPeriod(100000);
     
-    Scheduler::instance().addTask(t);
+    Scheduler<DefaultSchedulerConfig>::instance().addTask(t);
   }
 
 }
