@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make sasiae && ../../build-tinySASIAE-Desktop-Release/tinySASIAE
+make sasiae && tinySASIAE -r ./robot_sasiae.elf

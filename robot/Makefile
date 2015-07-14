@@ -55,12 +55,7 @@ AVR_BUILD_DIR=$(GEN_BUILD_DIR)
 
 ########################################
 # Rules
-all:
-	@echo "Usage :"
-	@echo "\t- make sasiae: Compile your project for sasiae"
-	@echo "\t- make atmegaX: Compile your project for atmegaX (X may be 16, 32, 128 or 2560)"
-	@echo "\t- make clean: Remove all temporary files"
-	@echo "\t- make mrproper: Remove all temporary files + the binary files"
+all: sasiae
 
 sasiae: export CC=$(SASIAE_CC)
 sasiae: export CFLAGS=$(SASIAE_CFLAGS)
