@@ -4,7 +4,8 @@
 # User Configuration
 
 ## The root aversive directory
-AVERSIVE_ROOT=../../aversive--
+## You can set it as an environment variable
+#AVERSIVE_ROOT=../../aversive--
 
 ## Your project's object .o files
 OBJ=main.o devices.o example.o
