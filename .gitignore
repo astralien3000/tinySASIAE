@@ -1,0 +1,10 @@
+# tmp
+*~
+
+# build
+*.o
+tinySASIAE
+
+# qmak
+moc_*
+ui_*
