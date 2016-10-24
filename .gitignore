@@ -4,6 +4,7 @@
 # build
 *.o
 tinySASIAE
+build
 
 # qmak
 moc_*
