@@ -28,6 +28,9 @@ private:
     Robot& _robot;
     const PhysicsEngine& _engine;
     QProcess _proc;
+
+    bool _left_encoder_enabled;
+    bool _right_encoder_enabled;
 };
 
 #endif // ROBOTBIN_HPP

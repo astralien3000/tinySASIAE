@@ -40,7 +40,8 @@ static const char *const valueMsg = "value";
 static const char *const stopMsg = "S";
 
 RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
-    QObject(parent), _robot(robot), _engine(engine)
+    QObject(parent), _robot(robot), _engine(engine),
+    _left_encoder_enabled(false), _right_encoder_enabled(false)
 {
     QStringList args = QCoreApplication::arguments();
     QString path = "";
@@ -66,37 +67,6 @@ RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
         qDebug() << "Could not start robot's code with path: " << path << "\n";
         throw std::runtime_error("");
     }
-
-    bool le = false, re = false;
-    for(int i = 0; i < 3; i++)
-    {
-        QString line = readLineFromProc();
-        if(line == leftEncInit)
-        {
-            le = true;
-        }
-        else if(line == rightEncInit)
-        {
-            re = true;
-        }
-        else if(line == ioInit)
-        {
-            // NOTHING TO DO
-        }
-        else
-        {
-            qDebug() << line << "\n";
-            killProc();
-            throw std::runtime_error("");
-        }
-    }
-
-    if(!(le && re))
-    {
-        qDebug() << "All the devices were not initialised\n";
-        killProc();
-        throw std::runtime_error("");
-    }
 }
 
 RobotBin::~RobotBin()
@@ -109,22 +79,39 @@ RobotBin::~RobotBin()
 
 void RobotBin::update()
 {
-    _proc.write(QString(leftEncMsg).arg(static_cast<int32_t>(encCoef * _robot.left_encoder)).toLocal8Bit().append("\n"));
-    _proc.write(QString(rightEncMsg).arg(static_cast<int32_t>(encCoef * _robot.right_encoder)).toLocal8Bit().append("\n"));
+    if(_left_encoder_enabled)  {
+        _proc.write(QString(leftEncMsg).arg(static_cast<int32_t>(encCoef * _robot.left_encoder)).toLocal8Bit().append("\n"));
+    }
+
+    if(_right_encoder_enabled) {
+        _proc.write(QString(rightEncMsg).arg(static_cast<int32_t>(encCoef * _robot.right_encoder)).toLocal8Bit().append("\n"));
+    }
+
     _proc.write(QString(syncMsg).arg(static_cast<u_int32_t>(timeCoef * _engine.getTime())).arg(mainLoopIteration).toLocal8Bit().append("\n"));
 
-    QString line;
-    while((line = readLineFromProc()) != QString() && line != QString(syncMsg2) && line != QString(stopMsg))
-    {
-        QStringList words = line.split(" ");
-        if(words.length() != 4)
-        {
-            qDebug() << line << "\n";
-            killProc();
-            throw std::runtime_error("");
-        }
+    while(_proc.canReadLine()) {
+        QString line = _proc.readLine(1024);
+        QStringList words = line.remove('\n').split(" ");
 
-        if(words[0] == QString(deviceMsg) && words[2] == QString(valueMsg))
+        if(line == leftEncInit)
+        {
+            qDebug() << "Left Encoder initialized";
+            _left_encoder_enabled = true;
+        }
+        else if(line == rightEncInit)
+        {
+            qDebug() << "Right Encoder initialized";
+            _right_encoder_enabled = true;
+        }
+        else if(line == ioInit)
+        {
+            // NOTHING TO DO
+        }
+        else if(words[0] == QString(syncMsg2))
+        {
+            // NOTHING TO DO
+        }
+        else if(words[0] == QString(deviceMsg) && words[2] == QString(valueMsg))
         {
             double speed = words[3].toDouble();
             if(words[1] == QString(leftMotName))
@@ -149,31 +136,6 @@ void RobotBin::update()
             killProc();
             throw std::runtime_error("");
         }
-    }
-}
-
-QString RobotBin::readLineFromProc()
-{
-    QString line;
-    char c = 0;
-
-    if(!_proc.getChar(&c)) {
-        _proc.waitForReadyRead();
-    }
-    else {
-        line.append(QChar(c));
-    }
-
-    while(_proc.getChar(&c) && c != '\n') {
-        line.append(QChar(c));
-    }
-
-    if(c == '\n') {
-        return line;
-    }
-    else {
-        // Problem
-        return QString();
     }
 }
 
