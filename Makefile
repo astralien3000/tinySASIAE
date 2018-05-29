@@ -1,6 +1,6 @@
 .PHONY: all clean mrproper install
 
-QMAKE ?= qmake-qt5
+QMAKE ?= qmake
 
 all: build/tinySASIAE
 
