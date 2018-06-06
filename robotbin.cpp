@@ -39,58 +39,45 @@ static const char *const valueMsg = "value";
 // Generic messages
 static const char *const stopMsg = "S";
 
-RobotBin::RobotBin(Robot& robot, const PhysicsEngine& engine, QObject *parent) :
-    QObject(parent), _robot(robot), _engine(engine),
+RobotBin::RobotBin(QString path) :
+    QObject(NULL),
     _left_encoder_enabled(false), _right_encoder_enabled(false)
 {
-    QStringList args = QCoreApplication::arguments();
-    QString path = "";
-    bool found = false;
-    for(int i = 0 ; i < args.count() ; i++) {
-        if(args[i] == "-r") {
-            if(i+1 < args.count()) {
-                path = args[i+1];
-                found = true;
-            }
-            else {
-                qDebug() << "Error in arguments : nothing after -r";
-            }
-        }
-    }
-    if(!found) {
-        qDebug() << "Robot's binary not found in application's arguments, trying default.";
-        path = binPath;
-    }
-
-    _proc.start(path, QStringList());
-    if(!_proc.waitForStarted()) {
-        qDebug() << "Could not start robot's code with path: " << path << "\n";
+    _interface.start(path, QStringList());
+    if(!_interface.waitForStarted()) {
+        qDebug() << "Could not start robot's code with path: " << path;
         throw std::runtime_error("");
     }
+
+    _interface.connect(&_interface, SIGNAL(readyRead()), this, SLOT(onRobotInput()));
+    _engine.getTimer().connect(&_engine.getTimer(), SIGNAL(timeout()), this, SLOT(onEngineUpdate()));
 }
 
 RobotBin::~RobotBin()
 {
-    if(_proc.state() != QProcess::NotRunning)
+    if(_interface.state() != QProcess::NotRunning)
     {
         killProc();
     }
 }
 
-void RobotBin::update()
+void RobotBin::onEngineUpdate()
 {
-    if(_left_encoder_enabled)  {
-        _proc.write(QString(leftEncMsg).arg(static_cast<int32_t>(encCoef * _robot.left_encoder)).toLocal8Bit().append("\n"));
-    }
+  if(_left_encoder_enabled)  {
+      _interface.write(QString(leftEncMsg).arg(static_cast<int32_t>(encCoef * _engine.getRobot().left_encoder)).toLocal8Bit().append("\n"));
+  }
 
-    if(_right_encoder_enabled) {
-        _proc.write(QString(rightEncMsg).arg(static_cast<int32_t>(encCoef * _robot.right_encoder)).toLocal8Bit().append("\n"));
-    }
+  if(_right_encoder_enabled) {
+      _interface.write(QString(rightEncMsg).arg(static_cast<int32_t>(encCoef * _engine.getRobot().right_encoder)).toLocal8Bit().append("\n"));
+  }
 
-    _proc.write(QString(syncMsg).arg(static_cast<uint32_t>(timeCoef * _engine.getTime())).arg(mainLoopIteration).toLocal8Bit().append("\n"));
+  _interface.write(QString(syncMsg).arg(static_cast<uint32_t>(timeCoef * _engine.getTime())).arg(mainLoopIteration).toLocal8Bit().append("\n"));
+}
 
-    while(_proc.canReadLine()) {
-        QString line = _proc.readLine(1024);
+void RobotBin::onRobotInput()
+{
+    while(_interface.canReadLine()) {
+        QString line = _interface.readLine(1024);
         QStringList words = line.remove('\n').split(" ");
 
         if(line == leftEncInit)
@@ -116,31 +103,29 @@ void RobotBin::update()
             double speed = words[3].toDouble();
             if(words[1] == QString(leftMotName))
             {
-                _robot.left_speed = leftMotCoef * speed;
+                _engine.getRobot().left_speed = leftMotCoef * speed;
             }
             else if(words[1] == QString(rightMotName))
             {
-                _robot.right_speed = rightMotCoef * speed;
+                _engine.getRobot().right_speed = rightMotCoef * speed;
             }
             else if(words[1] == QString(ioName)) {
                 std::cout << (char)words[3].toInt();
             }
             else
             {
-                killProc();
-                throw std::runtime_error("");
+                // unknown device, skip
             }
         }
         else
         {
-            killProc();
-            throw std::runtime_error("");
+            // unrecognized message, skip
         }
     }
 }
 
 void RobotBin::killProc()
 {
-    _proc.kill();
-    _proc.waitForFinished();
+    _interface.kill();
+    _interface.waitForFinished();
 }

@@ -2,11 +2,12 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QTimer>
+#include <QDebug>
 
 #include <iostream>
 
 #include <cmath>
-#include "physicsengine.hpp"
+#include "physics.hpp"
 #include "robotbin.hpp"
 
 int main(int argc, char *argv[])
@@ -35,33 +36,15 @@ int main(int argc, char *argv[])
       return 0;
     }
 
+    MainWindow mwin;
+    mwin.show();
+
     if(parser.isSet(robotbin_option)) {
       QStringList list = parser.values(robotbin_option);
       for(QStringList::Iterator it = list.begin() ; it != list.end() ; it++) {
-        std::cout << qPrintable(*it) << std::endl;
+        mwin.addRobot(new RobotBin(*it));
       }
     }
-
-    Robot r;
-    r.width = 50;
-
-    PhysicsEngine engine(r);
-
-    QTimer timer;
-    timer.setInterval(1000.0 / 60.0);
-
-    MainWindow w(r);
-    w.show();
-    w.showMaximized();
-    w.update();
-
-    //RobotBin bin(r, engine);
-
-    //timer.connect(&timer, SIGNAL(timeout()), &bin, SLOT(update()));
-    timer.connect(&timer, SIGNAL(timeout()), &engine, SLOT(update()));
-    timer.connect(&timer, SIGNAL(timeout()), &w, SLOT(update()));
-
-    timer.start();
 
     return app.exec();
 }

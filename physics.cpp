@@ -1,16 +1,16 @@
-#include "physicsengine.hpp"
+#include "physics.hpp"
 #include <cmath>
 
-PhysicsEngine::PhysicsEngine(Robot& robot)
-  : _robot(robot), _time(0.) {
+Physics::Physics(void)
+  : _time(0.) {
+  _robot.width = 50;
+
+  _timer.connect(&_timer, SIGNAL(timeout()), this, SLOT(update()));
+  _timer.setInterval(1000.0 / 60.0);
+  _timer.start();
 }
 
-double PhysicsEngine::getTime() const
-{
-  return _time;
-}
-
-void PhysicsEngine::update() {
+void Physics::update() {
   double delta_t = 0.1;
   double left_move = _robot.left_speed * delta_t;
   double right_move = _robot.right_speed * delta_t;

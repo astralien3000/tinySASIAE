@@ -15,13 +15,13 @@ TEMPLATE = app
 SOURCES += \
     main.cpp\
     mainwindow.cpp \
-    physicsengine.cpp \
+    physics.cpp \
     robotbin.cpp
 
 HEADERS  += \
     mainwindow.hpp\
     robot.hpp \
-    physicsengine.hpp \
+    physics.hpp \
     robotbin.hpp
 
 FORMS    += mainwindow.ui

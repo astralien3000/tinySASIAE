@@ -2,14 +2,17 @@
 #include "ui_mainwindow.h"
 #include <cmath>
 
-MainWindow::MainWindow(Robot& robot, QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    _robot(robot)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     ui->graphicsView->setScene(&_scene);
     ui->graphicsView->scale(1, 1);
+
+    _timer.connect(&_timer, SIGNAL(timeout()), this, SLOT(update()));
+    _timer.setInterval(1000.0 / 60.0);
+    _timer.start();
 }
 
 MainWindow::~MainWindow()
@@ -17,11 +20,11 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
-void MainWindow::renderRobot() {
+void MainWindow::renderRobot(const Robot& robot, QLinkedList<QPointF>& _pointList) {
 
-  QPointF pos(_robot.x, _robot.y);
-  QPointF dir = QPointF(cos(_robot.angle), sin(_robot.angle));
-  QPointF nor = QPointF(cos(_robot.angle + M_PI/2), sin(_robot.angle + M_PI/2));
+  QPointF pos(robot.x, robot.y);
+  QPointF dir = QPointF(cos(robot.angle), sin(robot.angle));
+  QPointF nor = QPointF(cos(robot.angle + M_PI/2), sin(robot.angle + M_PI/2));
 
   QPolygonF bot;
   double scale = 10;
@@ -33,14 +36,14 @@ void MainWindow::renderRobot() {
   wheel_size *= scale;
 
   QPolygonF right_wheel;
-  QPointF right_wheel_center = pos + nor * (_robot.width / 2);
+  QPointF right_wheel_center = pos + nor * (robot.width / 2);
   right_wheel.append(right_wheel_center + wheel_size.x() * nor + wheel_size.y() * dir);
   right_wheel.append(right_wheel_center - wheel_size.x() * nor + wheel_size.y() * dir);
   right_wheel.append(right_wheel_center - wheel_size.x() * nor - wheel_size.y() * dir);
   right_wheel.append(right_wheel_center + wheel_size.x() * nor - wheel_size.y() * dir);
 
   QPolygonF left_wheel;
-  QPointF left_wheel_center = pos - nor * (_robot.width / 2);
+  QPointF left_wheel_center = pos - nor * (robot.width / 2);
   left_wheel.append(left_wheel_center + wheel_size.x() * nor + wheel_size.y() * dir);
   left_wheel.append(left_wheel_center - wheel_size.x() * nor + wheel_size.y() * dir);
   left_wheel.append(left_wheel_center - wheel_size.x() * nor - wheel_size.y() * dir);
@@ -72,6 +75,7 @@ void MainWindow::renderRobot() {
   }
 }
 
+
 void MainWindow::renderWorld() {
 
   _scene.addLine(5,5,-5,-5);
@@ -95,22 +99,30 @@ void MainWindow::renderWorld() {
   _scene.addLine(MIN, MAX, MAX, MAX, borders_pen);
 }
 
+void MainWindow::updateRobotInfos(const Robot& robot) {
+  double display_angle = fmod(robot.angle * 180.0 / M_PI, 360);
+  if(display_angle < 0.0) display_angle += 360.0;
+
+  ui->widthLabel->setText(QString("Width: %1").arg(robot.width));
+  ui->xLabel->setText(QString("X: %1").arg(robot.x));
+  ui->yLabel->setText(QString("Y: %1").arg(robot.y));
+  ui->angleLabel->setText(QString("Angle: %1").arg(display_angle));
+  ui->leftSpeedLabel->setText(QString("Left speed: %1").arg(robot.left_speed));
+  ui->rightSpeedLabel->setText(QString("Right speed: %1").arg(robot.right_speed));
+  ui->leftEncLabel->setText(QString("Left enc: %1").arg(robot.left_encoder));
+  ui->rightEncLabel->setText(QString("Right enc: %1").arg(robot.right_encoder));
+}
+
 void MainWindow::update()
 {
     QMainWindow::update();
     _scene.clear();
     renderWorld();
-    renderRobot();
 
-    double display_angle = fmod(_robot.angle * 180.0 / M_PI, 360);
-    if(display_angle < 0.0) display_angle += 360.0;
-
-    ui->widthLabel->setText(QString("Width: %1").arg(_robot.width));
-    ui->xLabel->setText(QString("X: %1").arg(_robot.x));
-    ui->yLabel->setText(QString("Y: %1").arg(_robot.y));
-    ui->angleLabel->setText(QString("Angle: %1").arg(display_angle));
-    ui->leftSpeedLabel->setText(QString("Left speed: %1").arg(_robot.left_speed));
-    ui->rightSpeedLabel->setText(QString("Right speed: %1").arg(_robot.right_speed));
-    ui->leftEncLabel->setText(QString("Left enc: %1").arg(_robot.left_encoder));
-    ui->rightEncLabel->setText(QString("Right enc: %1").arg(_robot.right_encoder));
+    for(QLinkedList<InternalRobot>::Iterator it = _engines.begin() ; it != _engines.end() ; it++) {
+      if(it->engine) {
+        renderRobot(it->engine->getRobot(), it->_pointList);
+        updateRobotInfos(it->engine->getRobot());
+      }
+    }
 }
