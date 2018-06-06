@@ -87,7 +87,7 @@ void RobotBin::update()
         _proc.write(QString(rightEncMsg).arg(static_cast<int32_t>(encCoef * _robot.right_encoder)).toLocal8Bit().append("\n"));
     }
 
-    _proc.write(QString(syncMsg).arg(static_cast<u_int32_t>(timeCoef * _engine.getTime())).arg(mainLoopIteration).toLocal8Bit().append("\n"));
+    _proc.write(QString(syncMsg).arg(static_cast<uint32_t>(timeCoef * _engine.getTime())).arg(mainLoopIteration).toLocal8Bit().append("\n"));
 
     while(_proc.canReadLine()) {
         QString line = _proc.readLine(1024);
