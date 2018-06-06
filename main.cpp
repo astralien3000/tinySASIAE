@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     if(parser.isSet(robotbin_option)) {
       QStringList list = parser.values(robotbin_option);
       for(QStringList::Iterator it = list.begin() ; it != list.end() ; it++) {
-        mwin.addRobot(new RobotBin(*it));
+        mwin.addRobot(new RobotBin(*it), *it);
       }
     }
 

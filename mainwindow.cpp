@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include <cmath>
 
+#include <QTreeWidgetItem>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -99,18 +101,41 @@ void MainWindow::renderWorld() {
   _scene.addLine(MIN, MAX, MAX, MAX, borders_pen);
 }
 
-void MainWindow::updateRobotInfos(const Robot& robot) {
+void MainWindow::updateRobotInfos(const Robot& robot, const QString& name) {
   double display_angle = fmod(robot.angle * 180.0 / M_PI, 360);
   if(display_angle < 0.0) display_angle += 360.0;
 
-  ui->widthLabel->setText(QString("Width: %1").arg(robot.width));
-  ui->xLabel->setText(QString("X: %1").arg(robot.x));
-  ui->yLabel->setText(QString("Y: %1").arg(robot.y));
-  ui->angleLabel->setText(QString("Angle: %1").arg(display_angle));
-  ui->leftSpeedLabel->setText(QString("Left speed: %1").arg(robot.left_speed));
-  ui->rightSpeedLabel->setText(QString("Right speed: %1").arg(robot.right_speed));
-  ui->leftEncLabel->setText(QString("Left enc: %1").arg(robot.left_encoder));
-  ui->rightEncLabel->setText(QString("Right enc: %1").arg(robot.right_encoder));
+  QTreeWidgetItem* item = NULL;
+
+  QList<QTreeWidgetItem*> items = ui->treeWidget->findItems(name, Qt::MatchExactly);
+  if(items.empty()) {
+    item = new QTreeWidgetItem(QStringList(name));
+    ui->treeWidget->addTopLevelItem(item);
+    item->setExpanded(true);
+    item->setFirstColumnSpanned(true);
+    item->addChild(new QTreeWidgetItem(QStringList{"width", QString("%1").arg(robot.width)}));
+    item->addChild(new QTreeWidgetItem(QStringList{"x", QString("%1").arg(robot.x)}));
+    item->addChild(new QTreeWidgetItem(QStringList{"y", QString("%1").arg(robot.y)}));
+    item->addChild(new QTreeWidgetItem(QStringList{"angle", QString("%1").arg(display_angle)}));
+    item->addChild(new QTreeWidgetItem(QStringList{"left speed", QString("%1").arg(robot.left_speed)}));
+    item->addChild(new QTreeWidgetItem(QStringList{"right speed", QString("%1").arg(robot.right_speed)}));
+    item->addChild(new QTreeWidgetItem(QStringList{"left encoder", QString("%1").arg(robot.left_encoder)}));
+    item->addChild(new QTreeWidgetItem(QStringList{"right encoder", QString("%1").arg(robot.right_encoder)}));
+  }
+  else {
+    item = items[0];
+    for(int i = 0 ; i < item->childCount() ; i++) {
+      QTreeWidgetItem* child = item->child(i);
+      if(child->text(0) == "width") child->setText(1, QString("%1").arg(robot.width));
+      if(child->text(0) == "x") child->setText(1, QString("%1").arg(robot.x));
+      if(child->text(0) == "y") child->setText(1, QString("%1").arg(robot.y));
+      if(child->text(0) == "angle") child->setText(1, QString("%1").arg(display_angle));
+      if(child->text(0) == "left speed") child->setText(1, QString("%1").arg(robot.left_speed));
+      if(child->text(0) == "right speed") child->setText(1, QString("%1").arg(robot.right_speed));
+      if(child->text(0) == "left encoder") child->setText(1, QString("%1").arg(robot.left_encoder));
+      if(child->text(0) == "right encoder") child->setText(1, QString("%1").arg(robot.right_encoder));
+    }
+  }
 }
 
 void MainWindow::update()
@@ -122,7 +147,7 @@ void MainWindow::update()
     for(QLinkedList<InternalRobot>::Iterator it = _engines.begin() ; it != _engines.end() ; it++) {
       if(it->engine) {
         renderRobot(it->engine->getRobot(), it->_pointList);
-        updateRobotInfos(it->engine->getRobot());
+        updateRobotInfos(it->engine->getRobot(), it->name);
       }
     }
 }

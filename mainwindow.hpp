@@ -22,7 +22,7 @@ public:
   void renderRobot(const Robot& robot, QLinkedList<QPointF>& _pointList);
   void renderWorld(void);
 
-  void updateRobotInfos(const Robot& robot);
+  void updateRobotInfos(const Robot& robot, const QString & name);
 
 public slots:
     void update();
@@ -30,6 +30,7 @@ public slots:
 private:
     struct InternalRobot {
       const RobotBin* engine;
+      QString name;
       QLinkedList<QPointF> _pointList;
     };
 
@@ -43,9 +44,10 @@ private:
     static const int ADD_POINT_EVERY = 10;
 
 public:
-    void addRobot(RobotBin* bin) {
+    void addRobot(RobotBin* bin, QString name) {
       InternalRobot e;
       e.engine = bin;
+      e.name = name;
       _engines.append(e);
     }
 };
